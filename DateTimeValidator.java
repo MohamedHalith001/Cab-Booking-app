@@ -14,13 +14,14 @@ public class DateTimeValidator {
 	 * @param currTime
 	 * @return 
 	 */
-	public static boolean validateDateTime(LocalDate date, LocalTime time, LocalDate current, LocalTime currTime) {
+	public static boolean validateJourneyDateTime(LocalDate date, LocalTime time) {
+		LocalDate current = LocalDate.now();
+		LocalTime currentTime = LocalTime.now();
 		// Validating the provided date and Time
 		if (date.isBefore(current)) {
 			return false;
 		} else if (date.isEqual(current)) {
-
-			if (time.isBefore(currTime)) {
+			if (time.isBefore(currentTime)) {
 				return false;
 			}
 		}
@@ -36,8 +37,8 @@ public class DateTimeValidator {
 	 * @param current
 	 * @return boolean
 	 */
-	public static boolean validateDoB(LocalDate dOB, LocalDate current) {
-		// TODO Auto-generated method stub
+	public static boolean validateDoB(LocalDate dOB) {
+		LocalDate current = LocalDate.now();
 		if (dOB.isAfter(current)) {
 			return false;
 		}
@@ -56,7 +57,8 @@ public class DateTimeValidator {
 	 * @param current
 	 * @return boolean
 	 */
-	public static boolean isCardValid(LocalDate valid, LocalDate current) {
+	public static boolean isCardValid(LocalDate valid) {
+		LocalDate current = LocalDate.now();
 		if (valid.isBefore(current)) {
 			return false;
 		} 
@@ -71,7 +73,8 @@ public class DateTimeValidator {
 	 * @param current 
 	 * @return boolean
 	 */
-	public static boolean isSeniorCitizen(LocalDate dOB, LocalDate current) {
+	public static boolean isSeniorCitizen(LocalDate dOB) {
+		 LocalDate current = LocalDate.now();
 		int age = current.getYear() - dOB.getYear();
 		if (age >= 60)
 			return true;

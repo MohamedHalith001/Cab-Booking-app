@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+//import test.cabapp.*;
+
 
 public class Booking {
 
@@ -12,88 +14,79 @@ public class Booking {
 		// Variables used in the program
 		int choice;
 		double kms, cost, tax;
-		long mobile, mob;
-		LocalDate Date, current, DOB, valid;
-		LocalTime Time, currTime;
+		long mobile;
+		LocalDate Date,DOB, cardValidity;
+		LocalTime Time;
 		LocalDateTime timestamp;
-		String defPwd, pwd, dOB, date, time, ch, validity;
-		boolean output,senior,dateTime,doB,validCard;
+		String  password,dOB, date, time, option, validity;
+		boolean output,seniorCitizen,doB,validCard;
 
 		welcome();
 		
 		//Get user name and password from user
 		Scanner input = new Scanner(System.in);
-		System.out.println("Mobile No:     ");
-		mob = 9524896959L;
+		//TestUserCredentials.testCases();
+		System.out.println("Mobile No:");
 		mobile = input.nextLong();
-		defPwd = "pass1234";
-		System.out.println("Password       ");
-		pwd = input.next();
-		output = CredentialValidator.authenticate(mobile, defPwd, pwd, mob);
-
-		if (output == false) {
-			System.err.println("Invalid Credentials");
+		System.out.println("Password");
+		password=input.next();
+		output = CredentialValidator.authenticate(password, mobile);
+		if(output == false) {
 			System.exit(1);
 		}
-		
 		String[] cabs = { "Micro", "Mini", "Prime" };
 		int[] price = { 10, 15, 20 };
 
 		cabDetails(cabs, price);
+
+		System.out.println("Enter your choice");
 		choice = input.nextInt();
-
-		System.out.println("Enter your Pickup Location");
+		while(choice>3 || choice<=0) {
+			System.out.println("Please enter correct Choice");
+			choice  = input.nextInt();
+		}
+		System.out.println("Enter Pickup Location");
 		String pickup = input.next();
-
-		System.out.println("Enter your Destination");
+		System.out.println("Enter Destination");
 		String destination = input.next();
-
-		System.out.println("Please Enter the distance between your location and destination(in KM)");
-		kms = input.nextDouble();
-
-		System.out.println("Enter Journey Date (YYYY-MM-DD)");
+		System.out.println("Enter No. of Kms");
+		kms = input.nextInt();
+		//TestBookingDateAndTime.testCases();
+		System.out.println("Enter the journey date");
 		date = input.next();
 		Date = LocalDate.parse(date);
-
-		current = LocalDate.now();
-
-		currTime = LocalTime.now();
-
-		System.out.println("Enter Journey Time (HH:MM)");
+		System.out.println("Enter the travelling time");
 		time = input.next();
 		Time = LocalTime.parse(time);
-		dateTime =DateTimeValidator.validateDateTime(Date, Time, current, currTime);
-		if(dateTime==false)
-			System.exit(1);
-
-		cost = Calculation.calculate(price, kms, choice);
+		cost = PriceCalculator.calculate(price, kms, choice);
 
 		// Finds whether the booking is made for peak hour
 		
 		cost = DateTimeValidator.peakHours(Time, cost);
-		tax = Calculation.calculateGST(cost);
+		tax = PriceCalculator.calculateGST(cost);
 
 		timestamp = LocalDateTime.now();
 
 		System.out.println("Enter Your Date Of Birth(YYYY-MM-DD)");
 		dOB = input.next();
 		DOB = LocalDate.parse(dOB);
-		doB =DateTimeValidator.validateDoB(DOB, current);
+		doB =DateTimeValidator.validateDoB(DOB);
 		if(doB==false)
 			System.exit(1);
-		senior = DateTimeValidator.isSeniorCitizen(DOB,current);
+		seniorCitizen = DateTimeValidator.isSeniorCitizen(DOB);
 		cost = Math.ceil(cost);
-		
-		printReceipt(cost, tax, kms, choice, Date, Time, timestamp, pickup, senior, destination, mobile, cabs);
-		System.out.println("\n\nWould You like to pay through Card\n (Yes/No)");
-
-		ch = input.next();
-		if (ch.equalsIgnoreCase("Yes")) {
-			System.out.println("Enter the Expiry Month and Year of the card (YYYY-MM-DD) (Please add 01 for DD)");
+		printReceipt(cost, tax, kms, choice, Date, Time, timestamp, pickup, seniorCitizen, destination, mobile, cabs);
+		//Assuming user is paying through card
+		System.out.println("Would You like to pay through card?\nYes/No");
+		option = input.next();
+		if (option.equalsIgnoreCase("Yes")) {
+			//To continue...................
+			System.out.println("Enter card expiry year and month");
 			validity = input.next();
-			valid = LocalDate.parse(validity);
+			validity = validity + "-01";
+			cardValidity = LocalDate.parse(validity);
 			//Checks validity of Card
-			validCard=DateTimeValidator.isCardValid(valid, current);
+			validCard=DateTimeValidator.isCardValid(cardValidity);
 			if(validCard) {
 				System.out.println("Payment Successful :) ");
 			}else {
@@ -120,31 +113,14 @@ public class Booking {
 	 * @param price
 	 */
 	private static void cabDetails(String[] cabs, int[] price) {
-		System.out.println("---------CAB DETAILS--------");
+		System.out.println("\n---------CAB DETAILS--------");
 		for (int i = 0; i < cabs.length; i++) {
 			System.out.println((i + 1) + ". " + cabs[i] + " -(Rs." + price[i] + "/km)");
 		}
 		System.out.println("Enter your choice (1/2/3)");
 	}
 
-	/**
-	 * This method is used to print the invoice/bill to the customer for the service
-	 * provided. It also checks whether the customer is valid for the Senior Citizen
-	 * Discount and reduces the appropriate amount from the invoice.
-	 * 
-	 * @param cost
-	 * @param tax
-	 * @param kms
-	 * @param choice
-	 * @param date
-	 * @param time
-	 * @param timestamp
-	 * @param pickup
-	 * @param senior
-	 * @param destination
-	 * @param mobile
-	 * @param cabs
-	 */
+
 	private static void printReceipt(double cost, double tax, double kms, int choice, LocalDate date, LocalTime time,
 			LocalDateTime timestamp, String pickup, boolean senior, String destination, long mobile, String[] cabs) {
 		System.out.println("------------------Receipt------------------");
